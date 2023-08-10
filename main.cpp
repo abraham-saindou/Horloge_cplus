@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <utility>
 #include <tuple>
 
@@ -12,7 +14,7 @@ void Horloge::menu_choice() {
     char choice;
     std::cin>>choice;
 
-    if (choice == 'a'){
+   /* if (choice == 'a'){
         std::cout<<"You chose a, it will ask you a format to start a clock and clock will stop after 5 seconds.";
         set_format();
         show_hour();}
@@ -27,13 +29,13 @@ void Horloge::menu_choice() {
 
     else if (choice == 'c'){
         std::cout<<"You chose c, enter three number to create an alarm : ";
-        tempus = time.strftime("%H:%M:%S");
+        auto tempus = time.strftime("%H:%M:%S");
         std::cout<<"\r" << tempus << std::flush;
         std::string val1, val2, val3;
         std::cin>> val1 >> val2 >> val3;
         auto tup_alarm = std::make_tuple(val1, val2, val3);
         set_alarm(tup_alarm);}
-}
+*/}
 
 void Horloge::show_hour() {
     if(format){
@@ -45,11 +47,11 @@ void Horloge::show_hour() {
             time(&curr_time);
             curr_tm = localtime(&curr_time);
 
-            strftime(time_string, 50, "Current time is %I:%M:%S%p", curr_tm);
+            strftime(time_string, 50, "\rCurrent time is %I:%M:%S%p", curr_tm);
             //print("\r", self.t_time, end="")
 
             std::cout << "\r" << time_string << std::flush;
-            sleep(1);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
     else{
@@ -61,10 +63,10 @@ void Horloge::show_hour() {
             time(&curr_time);
             curr_tm = localtime(&curr_time);
 
-            strftime(time_string, 50, "Temps actuel : %H:%M:%S", curr_tm);
+            strftime(time_string, 50, "\rTemps actuel : %H:%M:%S", curr_tm);
 
-            std::cout << "\r" << time_string << std::flush;
-            sleep(1);
+            std::cout <<"\r"<< time_string << std::flush;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
     };
@@ -83,20 +85,25 @@ void Horloge::set_format() {
     }
 }
 
-void Horloge::set_hour(auto tup) {
-    time_t curr_time;
-    tm custom_time = {0};
-    struct tm * timeinfo;
-    char time_string[100];
+void Horloge::set_hour(int x, int y, int z) {
 
-    change = true;
-    //std::string tuptime = std::get<0>(tup) + ":" + std::get<1>(tup) + ":" + std::get<2>(tup);
-    custom_time.tm_hour = std::get<0>(tup); custom_time.tm_min = std::get<1>(tup); custom_time.tm_sec = std::get<2>(tup);
-    auto make = mktime(&custom_time);
-    time(&curr_time);
-    timeinfo = localtime(&curr_time);
-    auto set_time = mktime(strftime(time_string, 50, "%H:%M:%S", tuptime));
-    strftime(time_string, 50, "Temps actuel : %H:%M:%S", custom_time);
+    char buffer[64];
+    const char* fmt = "\r%H:%M:%S";
+    time_t  rawTime;
+    struct std::tm customTime;
+
+    customTime.tm_hour = x;
+    customTime.tm_min = y;
+    customTime.tm_sec = z;
+    customTime.tm_mday = 12;
+    customTime.tm_mon = 7;
+    customTime.tm_year = 123;
+    customTime.tm_isdst = -1;
+
+    rawTime = mktime(&customTime);
+    strftime(buffer, sizeof(buffer), fmt, localtime(&rawTime));
+    std::cout << "\r" << buffer << std::flush;
+    sleep(1);
 
 }
 
@@ -107,5 +114,6 @@ void Horloge::set_alarm(auto alarm) {
 int main() {
     Horloge clock;
     clock.show_hour();
+    // clock.set_hour(11, 11, 11);
     return 0;
 }

@@ -20,7 +20,7 @@ class Horloge {
 
         void menu_choice();
         void show_hour();
-        void set_hour(auto tup);
+        void set_hour(int x, int  y, int z);
         void set_alarm(auto alarm);
         void set_format();
         void pause_clock();
